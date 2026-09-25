@@ -1,0 +1,13 @@
+# 私钥与本地产物，绝不入库
+signing_key.pem
+signing_cert.pem
+*.pem
+*.apk.bak
+.extracted/
+_*.py
+_*.js
+_*.txt
+_*.json
+__pycache__/
+*.pyc
+.DS_Store
