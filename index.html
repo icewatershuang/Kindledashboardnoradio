@@ -7670,7 +7670,8 @@ function screenSize() {
     h = DESIGN_H;
   }
   var _ed = edgeInset();
-  var _rw = w, _rh = h;
+  var _rw = ROT === 90 || ROT === 270 ? h : w;
+  var _rh = ROT === 90 || ROT === 270 ? w : h;
   _rw = _rw - _ed * 2;
   if (_rw < 160) {
     _rw = 160;
@@ -8339,22 +8340,12 @@ function applyFit(opts) {
     return;
   }
   var sz = screenSize();
-  /* v32：按视口宽高比自动选横/竖画布（覆盖后台 ROT），实现“网页自适应、适应任何屏幕”。
-     Kindle 横屏（w>h）自动走 landscape 宽画布，避免竖画布被高度瓶颈挤成中间一条。 */
-  try {
-    var _stEl = document.getElementById('stage');
-    var _vw = (_stEl && _stEl.clientWidth) || window.innerWidth || 0;
-    var _vh = (_stEl && _stEl.clientHeight) || window.innerHeight || 0;
-    var _autoLS = _vw >= _vh;
-    if (_autoLS && ROT !== 90 && ROT !== 270) { ROT = 90; applyRotation(); }
-    else if (!_autoLS && (ROT === 90 || ROT === 270)) { ROT = 0; applyRotation(); }
-  } catch (eAuto) {}
   if (!sz || !sz.w || !sz.h || sz.w < 120 || sz.h < 160) {
     return;
   }
   var isLS = ROT === 90 || ROT === 270;
   var DW = isLS ? LS_W : DESIGN_W;
-  var DH = isLS ? LS_H : DESIGN_H;
+  var DH = isLS ? LS_H : measureDesignContentH() || DESIGN_H;
   var k = Math.min(sz.w / DW, (sz.h - BTN_BAR_PX) / DH);
   if (k > 3.2) {
     k = 3.2;
@@ -8398,8 +8389,7 @@ function applyFit(opts) {
         }
       } else {
         _layEl.style.width = DESIGN_W * k + "px";
-        _layEl.style.height = DESIGN_H * k + "px";
-        _layEl.style.overflow = "hidden";
+        _layEl.style.height = "auto";
       }
     }
   } catch (e) {
@@ -8443,26 +8433,6 @@ function applyFit(opts) {
     refreshPageInfo();
   } catch (e) {
   }
-  try { showDiag(); } catch (eDiag) {}
-}
-function showDiag() {
-  try {
-    if (window.location && /[?&]diag=0\b/.test(window.location.search || "")) { return; }
-    var d = document.getElementById("kdDiag");
-    if (!d) {
-      d = document.createElement("div");
-      d.id = "kdDiag";
-      d.style.cssText = "position:fixed;right:2px;bottom:2px;z-index:99999;font:9px/1.25 monospace;background:rgba(255,255,255,.88);color:#000;padding:2px 4px;border:1px solid #000;max-width:62%;pointer-events:none;";
-      (document.body || document.documentElement).appendChild(d);
-    }
-    var iw = window.innerWidth || 0, ih = window.innerHeight || 0;
-    var _ss = window.screen || {};
-    var sw = _ss.availWidth || _ss.width || 0, sh = _ss.availHeight || _ss.height || 0;
-    var st = document.getElementById("stage");
-    var scw = st ? st.clientWidth : 0, sch = st ? st.clientHeight : 0;
-    var vs = screenSize();
-    d.textContent = "iw=" + iw + " ih=" + ih + " sw=" + sw + " sh=" + sh + " stage=" + scw + "x" + sch + " sz=" + Math.round(vs.w) + "x" + Math.round(vs.h) + " k=" + (_fitScale ? _fitScale.toFixed(2) : "?") + " ROT=" + ROT + " dpr=" + (window.devicePixelRatio || 1) + " LS=" + (ROT === 90 || ROT === 270 ? 1 : 0);
-  } catch (eD) {}
 }
 function refreshPageInfo() {
   var el = $("pageInfo");
