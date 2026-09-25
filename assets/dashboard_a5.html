@@ -4629,10 +4629,6 @@ function renderWeather(cacheTs) {
     } catch (e4) {
     }
   }
-  try {
-    freezeCards(true);
-  } catch (eFz) {
-  }
 }
 function buildForecastFromWttr(d) {
   var out = [], labels = ["\u4ECA\u5929", "\u660E\u5929", "\u540E\u5929"];
@@ -9035,38 +9031,6 @@ function applyFixedGap() {
   } catch (e) {
   }
 }
-/* 防抖动：把日历/天气/诗歌三张卡的高度锁定为当前实测值，并 overflow:hidden。
-   这样它们内部内容（天气加载、诗歌轮换、日历重绘）变化时，不会推挤相邻板块。
-   仅在竖屏生效；横屏由 applyLandscapeSizes 另行处理。天气卡只有在已加载真实预报
-   （存在 .wrow）时才锁定，避免把"加载中"的临时高度误锁死。 */
-var _frozenCards = {};
-function freezeCards(force) {
-  try {
-    if (ROT === 90 || ROT === 270) {
-      return;
-    }
-    var _sel = ["card-cal", "card-weather", "card-poem"];
-    for (var _s = 0; _s < _sel.length; _s++) {
-      var _c = _sel[_s];
-      var _el = document.querySelector("." + _c);
-      if (!_el || !_el.offsetHeight) {
-        continue;
-      }
-      if (_c === "card-weather") {
-        var _wb = document.getElementById("weatherBox");
-        if (!_wb || !_wb.getElementsByClassName || !_wb.getElementsByClassName("wrow").length) {
-          continue;
-        }
-      }
-      if (force || !_frozenCards[_c]) {
-        _el.style.height = _el.offsetHeight + "px";
-        _el.style.overflow = "hidden";
-        _frozenCards[_c] = _el.offsetHeight;
-      }
-    }
-  } catch (e) {
-  }
-}
 function applyVerticalStretch() {
   var left = getCol("col-left");
   if (!left) {
@@ -9349,22 +9313,6 @@ function applyRotation() {
     el.className = (" " + (el.className || "") + " ").replace(" rot-land ", " ").replace(/^\s+|\s+$/g, "");
     el.className = (" " + (el.className || "") + " ").replace(" landscape ", " ").replace(/^\s+|\s+$/g, "");
   }
-  try {
-    if (ROT === 90 || ROT === 270) {
-      var _fcards = ["card-cal", "card-weather", "card-poem"];
-      for (var _fi = 0; _fi < _fcards.length; _fi++) {
-        var _fe = document.querySelector("." + _fcards[_fi]);
-        if (_fe && _fe.style) {
-          _fe.style.height = "";
-          _fe.style.overflow = "";
-        }
-      }
-      _frozenCards = {};
-    } else if (typeof _warmStable !== "undefined" && _warmStable) {
-      freezeCards();
-    }
-  } catch (e) {
-  }
 }
 function resolveRotation() {
   return CFG && CFG.rotate || 0;
@@ -9450,10 +9398,6 @@ function boot() {
       } catch (e) {
       }
       scheduleStretch(0);
-      try {
-        freezeCards();
-      } catch (eFz) {
-      }
     }, 900);
   }, 3e3);
 }
