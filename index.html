@@ -1782,7 +1782,7 @@ function loadConfig() {
   CFG.searchSource = saved.searchSource !== void 0 ? saved.searchSource : DEF_SEARCH_SOURCE;
   CFG.userProxy = saved.userProxy !== void 0 ? saved.userProxy : DEF_USER_PROXY;
   CFG.jsonpEndpoint = saved.jsonpEndpoint || DEF_JSONP_ENDPOINT;
-  CFG.weatherDays = parseInt(saved.weatherDays, 10) || 5;
+  CFG.weatherDays = parseInt(saved.weatherDays, 10) || 7;
   CFG.poemLines = parseInt(saved.poemLines, 10) || 2;
   CFG.fonts = saved.fonts && typeof saved.fonts === "object" ? saved.fonts : {};
   CFG.sysFont = typeof saved.sysFont === "number" && saved.sysFont > 0 ? saved.sysFont : 1;
@@ -3906,7 +3906,7 @@ function computeWxAlarms(d) {
     }
   }
   if (d && d.daily) {
-    var n = Math.min(d.daily.time.length, 5), i;
+    var n = Math.min(d.daily.time.length, fcDays()), i;
     for (i = 0; i < n; i++) {
       var ac2 = wxAlarmCode(d.daily.weather_code[i]);
       if (ac2) {
@@ -6782,7 +6782,7 @@ function saveSettings(silent) {
   } catch (eFr) {
   }
   CFG.poemLines = ($("stPoemLines") ? parseInt($("stPoemLines").value, 10) : CFG.poemLines) || 1;
-  CFG.weatherDays = ($("stFcDays") ? parseInt($("stFcDays").value, 10) : CFG.weatherDays) || 5;
+  CFG.weatherDays = ($("stFcDays") ? parseInt($("stFcDays").value, 10) : CFG.weatherDays) || 7;
   if (CFG.weatherDays < 3) {
     CFG.weatherDays = 3;
   }
